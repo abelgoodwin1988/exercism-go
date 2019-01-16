@@ -33,56 +33,7 @@ func constructStep(scale []string, step string) (newScale []string) {
 	isFlat, isSharp, isHalfStepIntervalNote := getNoteMeta(scale)
 	baseNote := strings.Replace(strings.Replace(newScale[len(newScale)-1], "#", "", -1), "b", "", -1)
 	nextNote := nextBaseNote(baseNote)
-	// fmt.Printf("isFlat:%v\nisSharp:%v\nisHalfStep:%v\nstep:%v\nnextNote:%v\n\n", isFlat, isSharp, isHalfStepIntervalNote, step, nextNote)
-	if isHalfStepIntervalNote {
-		if step == "M" {
-			if isFlat {
-				newScale = append(newScale, nextNote)
-				return newScale
-			}
-			if isSharp {
-				newScale = append(newScale, nextBaseNote(nextNote))
-				return newScale
-			}
-			newScale = append(newScale, nextNote+"#")
-			return newScale
-		} else if step == "m" {
-			if isFlat {
-				newScale = append(newScale, nextNote+"b")
-				return newScale
-			}
-			if isSharp {
-				newScale = append(newScale, nextNote+"#")
-				return newScale
-			}
-			newScale = append(newScale, nextNote)
-			return newScale
-		}
-	} else {
-		if step == "M" {
-			if isFlat {
-				newScale = append(newScale, nextNote+"b")
-				return newScale
-			}
-			if isSharp {
-				newScale = append(newScale, nextNote+"#")
-				return newScale
-			}
-			newScale = append(newScale, nextNote)
-			return newScale
-		} else if step == "m" {
-			if isFlat {
-				newScale = append(newScale, strings.Split(newScale[len(newScale)-1], "")[0])
-				return newScale
-			}
-			if isSharp {
-				newScale = append(newScale, nextNote)
-				return newScale
-			}
-			newScale = append(newScale, baseNote+"#")
-			return newScale
-		}
-	}
+
 	return newScale
 }
 
