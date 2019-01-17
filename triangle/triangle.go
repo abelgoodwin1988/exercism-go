@@ -1,28 +1,53 @@
-// This is a "stub" file.  It's a little start on your solution.
-// It's not a complete solution though; you have to write some code.
-
-// Package triangle should have a package comment that summarizes what it's about.
-// https://golang.org/doc/effective_go.html#commentary
+// Package triangle accepts three lengths and returns
+//	what type of triangle the three lengths would
+//	make
 package triangle
 
+import "math"
 
-// Notice KindFromSides() returns this type. Pick a suitable data type.
-type Kind
+// Kind implements string const values
+type Kind string
 
+// Declaration of const values to be represented
+//	in testing
 const (
-    // Pick values for the following identifiers used by the test program.
-    NaT // not a triangle
-    Equ // equilateral
-    Iso // isosceles
-    Sca // scalene
+	NaT = "Nat"
+	Equ = "Equ"
+	Iso = "Iso"
+	Sca = "Sca"
 )
 
 // KindFromSides should have a comment documenting it.
 func KindFromSides(a, b, c float64) Kind {
-	// Write some code here to pass the test suite.
-	// Then remove all the stock comments.
-	// They're here to help you get started but they only clutter a finished solution.
-	// If you leave them in, reviewers may protest!
 	var k Kind
+	// Check that each side has a non-zero, unsigned value
+	if a <= 0 || b <= 0 || c <= 0 {
+		k = NaT
+		return k
+	}
+	// Check that we have -at least- a degenerate triangle
+	if a+b < c ||
+		a+c < b ||
+		b+c < a {
+		k = NaT
+		return k
+	}
+	if math.IsNaN(a) || math.IsNaN(b) || math.IsNaN(c) {
+		k = NaT
+		return k
+	}
+	if math.IsInf(a, 0) || math.IsInf(b, 0) || math.IsInf(c, 0) {
+		k = NaT
+		return k
+	}
+	if a == b && b == c {
+		k = Equ
+	} else if (a == b && a != c) ||
+		(a == c && a != b) ||
+		(b == c && b != a) {
+		k = Iso
+	} else {
+		k = Sca
+	}
 	return k
 }
