@@ -1,82 +1,72 @@
+// Package scale implements scale construction in function scale
+//	when provided a interval-set string
 package scale
 
-import (
-	"fmt"
-	"strings"
-)
+import "strings"
 
-// Global declarations for ease of process in function
-var baseNotes = []string{"A", "B", "C", "D", "E", "F", "G"}
-var halfStepIntervalNotes = []string{"B", "E"}
+var allNotes = [][]string{{"G#", "Ab"}, {"A"}, {"A#", "Bb"}, {"B", "Cb"}, {"B#", "C"}, {"C#", "Db"}, {"D"}, {"D#", "Eb"}, {"E", "Fb"}, {"E#", "F"}, {"F#", "Gb"}, {"G"}}
 
-// Scale acceps a tonic and constructs a scale based on
-//	a provided series of either half or whole steps
-//	in intervals
+// We will be receiving a string of intervals m and M, use an int
+//	to representing how much of the allNotes array woudl be
+//	traversed in getting to that next note based on the interval
+var steps = map[string]int{
+	"m": 1,
+	"M": 2,
+}
+
+// Scale iterates through intervals and gets the next note
+//	the appropriate step ahead and constructs a scale as it
+//	goes
 func Scale(tonic string, intervals string) (scale []string) {
+	// set root note of scale, which is provided tonic note
 	scale = []string{tonic}
-	// Initialize intervals as chromatic scale
+	// initialize empty interval as chromatic
 	if intervals == "" {
-		intervals = "mmmmmmmmmmmm"
+		intervals = "mmmmmmmmmmm"
 	}
-	interval := strings.Split(intervals, "")
-	for _, value := range interval[:len(interval)-1] {
-		fmt.Printf("-------------------------------\n%v\n-------------------------------\n", scale)
-		scale = constructStep(scale[:], value)
+	// turn intervals into an array
+	intervalsArray := strings.Split(intervals, "")
+
+	index := 0
+	// endex := len(intervalsArray) - 1
+
+	// Find the index of our provided tonic note
+	for i, value := range allNotes {
+		index = i
+		if isInArray(tonic, value) {
+			break
+		}
+	}
+	// Get an ordered array of notes so we don't need to do any
+	//	iterating to end and then start at the beginning
+	//	while constructing our array
+	var orderedNotes = [][]string{}
+	for _, value := range allNotes[index:] {
+		orderedNotes = append(orderedNotes, value)
+	}
+	for _, value := range allNotes[:index] {
+		orderedNotes = append(orderedNotes, value)
+	}
+	println(orderedNotes)
+
+	// Iterate through our intervals and construct a
+	//	scale
+	index = 0
+	for _, interval := range intervalsArray {
+		scale = append(scale, orderedNotes[index+steps[interval]][0])
+
+		index += steps[interval]
 	}
 	return scale
 }
 
-// constructStep accepts an array of string notes, an interval,
-//	and returns a note one indicated step above.
-func constructStep(scale []string, step string) (newScale []string) {
-	newScale = scale[:]
-	isFlat, isSharp, isHalfStepIntervalNote := getNoteMeta(scale)
-	baseNote := strings.Replace(strings.Replace(newScale[len(newScale)-1], "#", "", -1), "b", "", -1)
-	nextNote := nextBaseNote(baseNote)
-
-	return newScale
-}
-
-// getNoteMeta will return if a note is flat, and is a half step interval note
-func getNoteMeta(scale []string) (isFlat bool, isSharp bool, isHalfStepIntervalNote bool) {
-	fmt.Printf("isFlat?: ")
-	if valueInArray("b", strings.Split(scale[len(scale)-1], "")) {
-		isFlat = true
-	}
-	fmt.Printf("isSharp?: ")
-	if valueInArray("#", strings.Split(scale[len(scale)-1], "")) {
-		isSharp = true
-	}
-	fmt.Printf("isHalfStep?: ")
-	if valueInArray(scale[len(scale)-1], halfStepIntervalNotes) {
-		isHalfStepIntervalNote = true
-	}
-	return isFlat, isSharp, isHalfStepIntervalNote
-}
-
-// valueInArray checks if an array of string contains a string
-func valueInArray(a string, list []string) bool {
-	for _, b := range list {
-		if b == a {
-			fmt.Printf("%v in %v\n", a, b)
+// Is in array takes a string and array of string, iterates
+//	through the array and checks for equality.
+func isInArray(str string, array []string) bool {
+	for _, value := range array {
+		if str == value {
 			return true
 		}
 	}
-	fmt.Printf("%v not in %v\n", a, list)
 	return false
-}
-
-// nextBaseNote returns the next alphabetical note
-func nextBaseNote(note string) (next string) {
-	for i, value := range baseNotes {
-		if value == note {
-			if i < len(baseNotes)-1 {
-				next = baseNotes[i+1]
-				break
-			}
-			next = baseNotes[0]
-			break
-		}
-	}
-	return next
 }
