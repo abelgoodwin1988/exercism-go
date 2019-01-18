@@ -6,19 +6,21 @@ package raindrops
 
 import "strconv"
 
+var plingplangplog = map[int]string{
+	3: "Pling",
+	5: "Plang",
+	7: "Plong",
+}
+
 // Convert converts numbers into raindrop sounds based on
 //	the raindrops package doc block
 func Convert(factor int) (raindrops string) {
 	// series of ifs using modulus 0 to determine
 	//	if the values are factorials
-	if factor%3 == 0 {
-		raindrops += "Pling"
-	}
-	if factor%5 == 0 {
-		raindrops += "Plang"
-	}
-	if factor%7 == 0 {
-		raindrops += "Plong"
+	for _, value := range []int{3, 5, 7} {
+		if factor%value == 0 {
+			raindrops += plingplangplog[value]
+		}
 	}
 	if raindrops == "" {
 		raindrops += strconv.Itoa(factor)
