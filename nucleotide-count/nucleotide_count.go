@@ -2,7 +2,6 @@ package dna
 
 import (
 	"errors"
-	"strings"
 )
 
 // Histogram is a mapping from nucleotide to its count in given DNA.
@@ -25,11 +24,10 @@ func (d DNA) Counts() (Histogram, error) {
 		'G': 0,
 		'T': 0,
 	}
-	for _, value := range strings.Split(string(d), "") {
+	for _, value := range []rune(d) {
 		var nonNucleotide bool
 		for nucleotide := range h {
-			n := string(nucleotide)
-			if value == n {
+			if value == nucleotide {
 				h[nucleotide]++
 				nonNucleotide = false
 				break
