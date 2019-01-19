@@ -28,10 +28,9 @@ func (d DNA) Counts() (Histogram, error) {
 	//	should return an err immediately.
 	for _, value := range d {
 		if _, ok := h[value]; !ok {
-			return h, fmt.Errorf("bad nucleotide %s", string(value))
-		} else {
-			h[value]++
+			return nil, fmt.Errorf("bad nucleotide %s", string(value))
 		}
+		h[value]++
 	}
 	return h, nil
 }
