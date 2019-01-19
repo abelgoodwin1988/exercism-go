@@ -1,15 +1,12 @@
 package dna
 
-import (
-	"errors"
-)
+import "fmt"
 
 // Histogram is a mapping from nucleotide to its count in given DNA.
-// Choose a suitable data type.
 type Histogram map[rune]int
 
-// DNA is a list of nucleotides. Choose a suitable data type.
-type DNA string
+// DNA is a list of nucleotides.
+type DNA []rune
 
 // Counts generates a histogram of valid nucleotides in the given DNA.
 // Returns an error if d contains an invalid nucleotide.
@@ -24,19 +21,16 @@ func (d DNA) Counts() (Histogram, error) {
 		'G': 0,
 		'T': 0,
 	}
-	for _, value := range []rune(d) {
-		var nonNucleotide bool
-		for nucleotide := range h {
-			if value == nucleotide {
-				h[nucleotide]++
-				nonNucleotide = false
-				break
-			} else {
-				nonNucleotide = true
-			}
-		}
-		if nonNucleotide {
-			return h, errors.New("Non Nucleotide in strand")
+	// Iterate through the string as an array of runes (runes to match
+	//	histogram mapping). Attempt to access the hisogram map
+	//	at the specified value location, and if successful, that
+	//	nucleotide exists, if err we have a non-nucleotide and
+	//	should return an err immediately.
+	for _, value := range d {
+		if _, ok := h[value]; !ok {
+			return h, fmt.Errorf("bad nucleotide %s", string(value))
+		} else {
+			h[value]++
 		}
 	}
 	return h, nil
