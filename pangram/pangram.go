@@ -1,54 +1,21 @@
-// Package pangram contains method to determine is a word is a panagram
 package pangram
 
 import "strings"
 
-var alphabet = map[rune]bool{
-	'a': false,
-	'b': false,
-	'c': false,
-	'd': false,
-	'e': false,
-	'f': false,
-	'g': false,
-	'h': false,
-	'i': false,
-	'j': false,
-	'k': false,
-	'l': false,
-	'm': false,
-	'n': false,
-	'o': false,
-	'p': false,
-	'q': false,
-	'r': false,
-	's': false,
-	't': false,
-	'u': false,
-	'v': false,
-	'w': false,
-	'x': false,
-	'y': false,
-	'z': false,
-}
+const testVersion = 1
 
-// IsPangram accepts and strings and returns a boolean
-//	for if it is a pangram.
-func IsPangram(s string) bool {
-	// get a copy of alphabet
-	newAlphabet := make(map[rune]bool)
-	for key, val := range alphabet {
-		newAlphabet[key] = val
-	}
-	// set present values to true
-	for _, val := range strings.ToLower(s) {
-		newAlphabet[val] = true
-	}
-	// check for any false key values (missing alphabet)
-	for _, val := range newAlphabet {
-		if val == false {
-			return false
+//IsPangram which determines if the sentence is Pangram
+func IsPangram(sentence string) bool {
+
+	var isPangram = true
+	sentenceUpper := strings.ToUpper(sentence) //Converting the words to upper case (Pangram is case insensitive)
+
+	for i := 65; i < 91; i++ { //ASCII Range of Upper Case
+		if !strings.ContainsRune(sentenceUpper, rune(i)) {
+			isPangram = false
+			break
 		}
 	}
-	return true
+	return isPangram
+
 }
