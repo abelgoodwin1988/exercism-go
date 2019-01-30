@@ -1,30 +1,29 @@
-// Package wordcount ...
+// Package wordcount count words
 package wordcount
 
 import (
-	"regexp"
+	"strconv"
 	"strings"
+	"unicode"
 )
 
-// Frequency is a map that tracks the frequency
-//	of a words in a phrase
+// Frequency is an histogram of the words in a phrase
 type Frequency map[string]int
 
-// WordCount accepts a string and returens a frequency
-//	which defines the count of each word in that phrase
-func WordCount(s string) Frequency {
-	frequency := Frequency{}
-	re := regexp.MustCompile("\\s|[\",]")
-	words := re.Split(s, -1)
-	for _, word := range words {
-		re = regexp.MustCompile("[^a-zA-Z0-9_']")
-		word = strings.ToLower(re.ReplaceAllLiteralString(word, ""))
-		re = regexp.MustCompile("^'|'$")
-		word = strings.ToLower(re.ReplaceAllLiteralString(word, ""))
-		if word == "" {
+// WordCount counts the word in a sentence
+func WordCount(input string) Frequency {
+	var frequencyCount Frequency = map[string]int{}
+	for _, word := range strings.FieldsFunc(input, func(r rune) bool {
+		return !unicode.IsLetter(r) && !unicode.IsNumber(r) && r != 39
+	}) {
+		word := strings.ToLower(word)
+		newWord, err := strconv.Unquote(strings.Replace(word, "'", "\"", -1))
+		if err == nil {
+			frequencyCount[newWord]++
 			continue
 		}
-		frequency[word]++
+		frequencyCount[word]++
 	}
-	return frequency
+
+	return frequencyCount
 }
