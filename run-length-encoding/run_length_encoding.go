@@ -3,12 +3,34 @@ package encode
 
 import (
 	"strconv"
+	"unicode"
 )
 
 // RunLengthDecode takes an encoded RLE and decodes it
 //	to a lossless string
 func RunLengthDecode(s string) string {
-
+	num := ""
+	stringer := ""
+	for _, r := range s {
+		if unicode.IsNumber(r) {
+			if num == "" {
+				num = string(r)
+				continue
+			} else {
+				num += string(r)
+			}
+		} else {
+			if val, ok := strconv.Atoi(num); ok == nil {
+				for i := 0; i < val; i++ {
+					stringer += string(r)
+				}
+			} else {
+				stringer += string(r)
+			}
+			num = ""
+		}
+	}
+	return stringer
 }
 
 // RunLengthEncode takes a normal string of spaces/alphabets
