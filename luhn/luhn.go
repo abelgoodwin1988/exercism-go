@@ -71,11 +71,3 @@ func charToNum(r rune) int {
 	}
 	return 0
 }
-
-// reverse 's the direction of a string
-func reverse(s string) (result string) {
-	for _, v := range s {
-		result = string(v) + result
-	}
-	return
-}
