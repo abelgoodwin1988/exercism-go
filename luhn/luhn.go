@@ -2,8 +2,6 @@
 package luhn
 
 import (
-	"regexp"
-	"strings"
 	"unicode"
 )
 
@@ -11,39 +9,50 @@ import (
 //	if it is a valid identification number, which follows
 //	the luhn algorithm.
 func Valid(s string) bool {
-	// replace space characters
-	re := regexp.MustCompile("\\s")
-	s = re.ReplaceAllLiteralString(reverse(s), "")
-	// invalidate with alphabet char present
-	re = regexp.MustCompile("\\D")
-	if re.FindAllString(s, -1) != nil {
-		return false
+	/**
+	 * Clean & Validate string
+	 */
+	// Replace space, if non-number invalidate.
+	cleanedString := ""
+	for _, r := range s {
+		if unicode.IsSpace(r) {
+			continue
+		}
+		if string(r) == "-" {
+			return false
+		}
+		if unicode.IsLetter(r) {
+			return false
+		}
+		if unicode.IsSymbol(r) {
+			return false
+		}
+		cleanedString += string(r)
 	}
 	// catch and return insufficient length strings
-	if len(s) < 2 {
+	if len(cleanedString) < 2 {
 		return false
 	}
 
-	// remove any characters that are non numbers that
-	//	dont constitue an invalidation above
-	n := strings.TrimFunc(s, func(r rune) bool {
-		return !unicode.IsNumber(r) && unicode.IsLetter(r)
-	})
 	// instantiate slice to hold ints to be summed
 	var ns = []int{}
 	// iterate through our transformed string of ints and
 	//	apply the doubling rule.
-	for i, r := range n {
-		if (i+1)%2 == 0 {
+	var count int
+	for i := len(cleanedString) - 1; i >= 0; i-- {
+		r := []rune(cleanedString)[i]
+		if (count+1)%2 == 0 {
 			if d := charToNum(r) * 2; d > 9 {
 				d -= 9
 				ns = append(ns, d)
 			} else {
 				ns = append(ns, d)
 			}
+			count++
 			continue
 		}
 		ns = append(ns, charToNum(r))
+		count++
 		continue
 	}
 	// sum the sequence of numbers
