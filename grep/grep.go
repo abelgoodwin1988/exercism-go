@@ -5,6 +5,7 @@ package grep
 
 import (
 	"bufio"
+	"log"
 	"os"
 	"strconv"
 	"strings"
@@ -55,19 +56,22 @@ func Search(pattern string, flags []string, files []string) (matches []string) {
 	for _, file := range files {
 		// Open the file
 		f, err := os.Open(file)
+		if err != nil {
+			log.Fatalf("Error opening file %v: \n%v\n", file, err)
+			return nil
+		}
 		defer f.Close()
-		check(err)
 		// Read the file
 		scanner := bufio.NewScanner(f)
-		var fileArray []string
+		var fileLineArray []string
 		// Send each line to an array
 		for scanner.Scan() {
-			fileArray = append(fileArray, scanner.Text())
+			fileLineArray = append(fileLineArray, scanner.Text())
 		}
 
 		// Iterate through array, check for matches, assign to
 		//	return string array.
-		for lineNumber, value := range fileArray {
+		for lineNumber, value := range fileLineArray {
 			if flagsMap["-v"] {
 				if flagsMap["-i"] && flagsMap["-x"] {
 					insensitivePattern := strings.ToLower(pattern)
@@ -156,11 +160,4 @@ func matched(matches []string, flagsMap map[string]bool, file string, value stri
 	matchLine += value
 	rtnMatches = append(matches, matchLine)
 	return rtnMatches
-}
-
-// simple err check w/ panic.
-func check(e error) {
-	if e != nil {
-		panic(e)
-	}
 }
