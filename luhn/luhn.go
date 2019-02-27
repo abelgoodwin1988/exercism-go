@@ -33,9 +33,8 @@ func Valid(s string) bool {
 	if len(cleanedString) < 2 {
 		return false
 	}
-
-	// instantiate slice to hold ints to be summed
-	var ns = []int{}
+	// Instantiate sum for luhn
+	var sum int
 	// iterate through our transformed string of ints and
 	//	apply the doubling rule.
 	var count int
@@ -44,21 +43,16 @@ func Valid(s string) bool {
 		if (count+1)%2 == 0 {
 			if d := charToNum(r) * 2; d > 9 {
 				d -= 9
-				ns = append(ns, d)
+				sum += d
 			} else {
-				ns = append(ns, d)
+				sum += d
 			}
 			count++
 			continue
 		}
-		ns = append(ns, charToNum(r))
+		sum += charToNum(r)
 		count++
 		continue
-	}
-	// sum the sequence of numbers
-	var sum int
-	for _, val := range ns {
-		sum += val
 	}
 	// if divisible by 10, it's valid!
 	return (sum%10 == 0)
