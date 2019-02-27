@@ -21,6 +21,13 @@ var flagsMap = map[string]bool{
 	"-x": false,
 }
 
+// Use readable names for mappings
+var printLineNumbers = flagsMap["-n"]
+var printFileNames = flagsMap["-l"]
+var invertMatch = flagsMap["-i"]
+var ignoreCase = flagsMap["-v"]
+var matchWholeLine = flagsMap["-x"]
+
 /*
 Search accepts a pattern string, flags string and  files []string.
 
@@ -50,8 +57,12 @@ func Search(pattern string, flags []string, files []string) (matches []string) {
 	for _, value := range flags {
 		flagsMap[value] = true
 	}
-	// Initalize the return array of string
-
+	// set simple names for current search
+	printLineNumbers = flagsMap["-n"]
+	printFileNames = flagsMap["-l"]
+	invertMatch = flagsMap["-i"]
+	ignoreCase = flagsMap["-v"]
+	matchWholeLine = flagsMap["-x"]
 	// iterate through list of file names
 	for _, file := range files {
 		// Open the file
@@ -72,58 +83,58 @@ func Search(pattern string, flags []string, files []string) (matches []string) {
 		// Iterate through array, check for matches, assign to
 		//	return string array.
 		for lineNumber, value := range fileLineArray {
-			if flagsMap["-v"] {
-				if flagsMap["-i"] && flagsMap["-x"] {
+			if ignoreCase {
+				if invertMatch && matchWholeLine {
 					insensitivePattern := strings.ToLower(pattern)
 					insensitiveValue := strings.ToLower(value)
 					if insensitivePattern != insensitiveValue {
-						matches = matched(matches, flagsMap, file, value, lineNumber, multipleFiles)
+						matches = matched(matches, file, value, lineNumber, multipleFiles)
 					}
 					continue
 				}
-				if flagsMap["-i"] {
+				if invertMatch {
 					insensitivePattern := strings.ToLower(pattern)
 					insensitiveValue := strings.ToLower(value)
 					if !strings.Contains(insensitiveValue, insensitivePattern) {
-						matches = matched(matches, flagsMap, file, value, lineNumber, multipleFiles)
+						matches = matched(matches, file, value, lineNumber, multipleFiles)
 					}
 					continue
 				}
-				if flagsMap["-x"] {
+				if matchWholeLine {
 					if value != pattern {
-						matches = matched(matches, flagsMap, file, value, lineNumber, multipleFiles)
+						matches = matched(matches, file, value, lineNumber, multipleFiles)
 					}
 					continue
 				}
 				if !strings.Contains(value, pattern) {
-					matches = matched(matches, flagsMap, file, value, lineNumber, multipleFiles)
+					matches = matched(matches, file, value, lineNumber, multipleFiles)
 				}
 				continue
 			} else {
-				if flagsMap["-i"] && flagsMap["-x"] {
+				if invertMatch && matchWholeLine {
 					insensitivePattern := strings.ToLower(pattern)
 					insensitiveValue := strings.ToLower(value)
 					if insensitivePattern == insensitiveValue {
-						matches = matched(matches, flagsMap, file, value, lineNumber, multipleFiles)
+						matches = matched(matches, file, value, lineNumber, multipleFiles)
 					}
 					continue
 				}
-				if flagsMap["-i"] {
+				if invertMatch {
 					insensitivePattern := strings.ToLower(pattern)
 					insensitiveValue := strings.ToLower(value)
 					if strings.Contains(insensitiveValue, insensitivePattern) {
-						matches = matched(matches, flagsMap, file, value, lineNumber, multipleFiles)
+						matches = matched(matches, file, value, lineNumber, multipleFiles)
 					}
 					continue
 				}
-				if flagsMap["-x"] {
+				if matchWholeLine {
 					if value == pattern {
-						matches = matched(matches, flagsMap, file, value, lineNumber, multipleFiles)
+						matches = matched(matches, file, value, lineNumber, multipleFiles)
 					}
 					continue
 				}
 				if strings.Contains(value, pattern) {
-					matches = matched(matches, flagsMap, file, value, lineNumber, multipleFiles)
+					matches = matched(matches, file, value, lineNumber, multipleFiles)
 				}
 				continue
 			}
@@ -132,9 +143,9 @@ func Search(pattern string, flags []string, files []string) (matches []string) {
 	return matches
 }
 
-func matched(matches []string, flagsMap map[string]bool, file string, value string, lineNumber int, multipleFiles bool) (rtnMatches []string) {
+func matched(matches []string, file string, value string, lineNumber int, multipleFiles bool) (rtnMatches []string) {
 	var matchLine string
-	if flagsMap["-l"] {
+	if printFileNames {
 		for _, fileName := range matches {
 			if fileName == file {
 				return matches
