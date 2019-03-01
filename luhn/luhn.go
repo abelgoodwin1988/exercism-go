@@ -2,6 +2,7 @@
 package luhn
 
 import (
+	"strings"
 	"unicode"
 )
 
@@ -12,56 +13,41 @@ func Valid(s string) bool {
 	/**
 	 * Clean & Validate string
 	 */
-	// Replace space, if non-number invalidate.
-	cleanedString := ""
-	for _, r := range s {
-		if unicode.IsSpace(r) {
-			continue
-		}
-		if string(r) == "-" {
-			return false
-		}
-		if unicode.IsLetter(r) {
-			return false
-		}
-		if unicode.IsSymbol(r) {
-			return false
-		}
-		cleanedString += string(r)
-	}
-	// catch and return insufficient length strings
-	if len(cleanedString) < 2 {
+
+	// Clean the string of unacceptable but interrupting characters
+	//	such as spaces which are allowable, but interrupt the positional
+	// calculation
+	s = strings.Replace(s, " ", "", -1)
+
+	// VALIDATION & PROCESS
+	// Strings less than 2 in lengths are invalid
+	if len(s) < 2 {
 		return false
 	}
-	// Instantiate sum for luhn
+	// Iterate over Luhn Candidate and invalidate candidates
+	// containing non-luhn acceptable characters.
+	//	Also sum as we go for the appropriately positioned characters
 	var sum int
-	// iterate through our transformed string of ints and
-	//	apply the doubling rule.
-	var count int
-	for i := len(cleanedString) - 1; i >= 0; i-- {
-		r := []rune(cleanedString)[i]
-		if (count+1)%2 == 0 {
-			if d := charToNum(r) * 2; d > 9 {
-				d -= 9
-				sum += d
-			} else {
-				sum += d
-			}
-			count++
-			continue
+	var count = 0
+	for i := len(s) - 1; i >= 0; i-- {
+		r := rune(s[i])
+		// all characters in a luhn set should be a number
+		if !unicode.IsDigit(r) {
+			return false
 		}
-		sum += charToNum(r)
+		// Get a int from the rune
+		d := int(r - '0')
+		// If this is a 'second' position, it should be doubled
+		//	and if it is > 9 it should be subtracted by 9
+		//	and added to the sum
+		if count%2 == 1 {
+			d *= 2
+			if d < 0 || d > 9 {
+				d -= 9
+			}
+		}
+		sum += d
 		count++
-		continue
 	}
-	// if divisible by 10, it's valid!
 	return (sum%10 == 0)
-}
-
-// charToNum converts a rune char in to an int
-func charToNum(r rune) int {
-	if '0' <= r && r <= '9' {
-		return int(r) - '0'
-	}
-	return 0
 }
