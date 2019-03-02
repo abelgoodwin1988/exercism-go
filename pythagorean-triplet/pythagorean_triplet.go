@@ -10,8 +10,8 @@ type Triplet struct {
 	c int
 }
 
-// Sum accepts a sum of pythagorean a triplet. It then calculates
-//	and returns all possible pythagorean triplets.
+// Sum accepts a sum of Pythagorean a triplet. It then calculates
+//	and returns all possible Pythagorean triplets.
 func Sum(p int) []Triplet {
 	t := []Triplet{}
 	for a := 2; a < p/3; a++ {
@@ -25,7 +25,9 @@ func Sum(p int) []Triplet {
 	return t
 }
 
-// Range ...
+// Range accepts a minimum and maximum acceptable values
+//	for a Pythagorean triplet and calculates all Pythagoren
+//	triplets within those bounds
 func Range(min, max int) []Triplet {
 	t := []Triplet{}
 	for a := min; a <= max; a++ {
