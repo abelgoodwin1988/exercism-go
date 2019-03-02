@@ -42,7 +42,7 @@ func Valid(s string) bool {
 		//	and added to the sum
 		if count%2 == 1 {
 			d *= 2
-			if d < 0 || d > 9 {
+			if d > 9 {
 				d -= 9
 			}
 		}
