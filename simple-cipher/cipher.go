@@ -72,9 +72,23 @@ func (c *Caesar) Encode(s string) string {
 
 // Encode ...
 func (c *Shift) Encode(s string) string {
-	s = strings.Map(Normalize, s)
-	fmt.Print(s)
-	return ""
+	normalizedS := strings.Map(Normalize, s)
+	cipheredS := strings.Map(
+		func(r rune) rune {
+			switch {
+			case c.distance < 0:
+				if r+rune(c.distance) < 'a' {
+					return 'z' - (r+rune(c.distance))%26
+				}
+				return r - rune(c.distance*-1)
+			default:
+				if r+rune(c.distance) > 'z' {
+					return (r-'a'+rune(c.distance))%26 + 'a'
+				}
+				return r + rune(c.distance)
+			}
+		}, normalizedS)
+	return cipheredS
 }
 
 // Encode ...
@@ -99,9 +113,15 @@ func (c *Caesar) Decode(s string) string {
 
 // Decode ...
 func (c *Shift) Decode(s string) string {
-	s = strings.Map(Normalize, s)
-	fmt.Print(s)
-	return ""
+	normalizedS := strings.Map(Normalize, s)
+	cipheredS := strings.Map(
+		func(r rune) rune {
+			if r-rune(c.distance) < 'a' {
+				return ('a' - r) + 'z'
+			}
+			return r - rune(c.distance)
+		}, normalizedS)
+	return cipheredS
 }
 
 // Decode ...
