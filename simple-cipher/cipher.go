@@ -62,10 +62,10 @@ func (c *Caesar) Encode(s string) string {
 	normalizedS := strings.Map(Normalize, s)
 	cipheredS := strings.Map(
 		func(r rune) rune {
-			if r+3 > 'z' {
-				return r + 3 - 'a'
+			if r+rune(3) > 'z' {
+				return (r-'a'+rune(3))%26 + 'a'
 			}
-			return r + 3
+			return r + rune(3)
 		}, normalizedS)
 	return cipheredS
 }
@@ -86,9 +86,15 @@ func (c *Vigenere) Encode(s string) string {
 
 // Decode ...
 func (c *Caesar) Decode(s string) string {
-	s = strings.Map(Normalize, s)
-	fmt.Print(s)
-	return ""
+	normalizedS := strings.Map(Normalize, s)
+	cipheredS := strings.Map(
+		func(r rune) rune {
+			if r-rune(3) < 'a' {
+				return ('a' - r) + 'z'
+			}
+			return r - rune(3)
+		}, normalizedS)
+	return cipheredS
 }
 
 // Decode ...
