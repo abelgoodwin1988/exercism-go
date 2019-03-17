@@ -5,7 +5,6 @@ package grains
 
 import (
 	"errors"
-	"math"
 )
 
 // Square accepts an integer representing the nth square
@@ -20,7 +19,7 @@ func Square(n int) (uint64, error) {
 	if n < 3 {
 		return uint64(n), nil
 	}
-	return uint64(math.Pow(2, float64(n)-1)), nil
+	return 1 << (uint(n) - 1), nil
 }
 
 // Total returns the total number of grains of rice
