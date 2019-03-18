@@ -16,20 +16,15 @@ func Square(n int) (uint64, error) {
 	if n < 1 || n > 64 {
 		return 0, errors.New("out-of-range chess-board square value")
 	}
-	if n < 3 {
-		return uint64(n), nil
-	}
 	return 1 << (uint(n) - 1), nil
 }
 
 // Total returns the total number of grains of rice
 //	found on a chess-board following the doubling algorithm
 func Total() uint64 {
-	var sum uint64
-	j := uint64(1)
+	sum := uint64(1)
 	for i := uint64(1); i < 64; i++ {
-		j *= 2
-		sum += j
+		sum += 1 << uint(i)
 	}
-	return 1 + sum
+	return sum
 }
