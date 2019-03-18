@@ -22,9 +22,5 @@ func Square(n int) (uint64, error) {
 // Total returns the total number of grains of rice
 //	found on a chess-board following the doubling algorithm
 func Total() uint64 {
-	sum := uint64(1)
-	for i := uint64(1); i < 64; i++ {
-		sum += 1 << uint(i)
-	}
-	return sum
+	return uint64(1<<64 - 1)
 }
