@@ -1,7 +1,6 @@
 package cipher
 
 import (
-	"fmt"
 	"strings"
 )
 
@@ -37,7 +36,9 @@ type Shift struct {
 	distance int
 }
 
-// Vigenere ...
+// Vigenere struct to implement encoding and decoding of a Vigenere Cipher,
+//	which implements the Ciper interface. The key field uses a string as the
+//	cipher.
 type Vigenere struct {
 	key string
 }
@@ -64,8 +65,20 @@ func NewShift(distance int) *Shift {
 	return &Shift{distance: distance}
 }
 
-// NewVigenere ...
+// NewVigenere accepts a string to be used as a cipher. The characters represent their
+//	index in the corresponding alphabet; so a = index 0, d = index 3. Applying the cipher
+//	by matching cipher index to subject string index we get an encoded string by shifting
+//	the subect string by the ciphers corresponding index as the distance.
 func NewVigenere(key string) *Vigenere {
+	// Invalidate invalid keys with nil return
+	if len(key) <= 2 {
+		return nil
+	}
+	for _, r := range key {
+		if r < 'a' || r > 'z' {
+			return nil
+		}
+	}
 	return &Vigenere{key: key}
 }
 
@@ -73,21 +86,21 @@ func NewVigenere(key string) *Vigenere {
 //	and wrapping when exceeding the English alphabet character upper-bound of z.
 func (c *Caesar) Encode(s string) string {
 	normalizedS := strings.Map(Normalize, s)
-	cipheredS := strings.Map(
+	encodedS := strings.Map(
 		func(r rune) rune {
 			if r+rune(3) > 'z' {
 				return (r-'a'+rune(3))%26 + 'a'
 			}
 			return r + rune(3)
 		}, normalizedS)
-	return cipheredS
+	return encodedS
 }
 
 // Encode Shift returns ciphered string by shifting the Shift structs set distance
 //	field. Wraps when exceeding upper bound or below lower bound.
 func (c *Shift) Encode(s string) string {
 	normalizedS := strings.Map(Normalize, s)
-	cipheredS := strings.Map(
+	encodedS := strings.Map(
 		func(r rune) rune {
 			switch {
 			case c.distance < 0:
@@ -102,14 +115,29 @@ func (c *Shift) Encode(s string) string {
 				return r + rune(c.distance)
 			}
 		}, normalizedS)
-	return cipheredS
+	return encodedS
 }
 
-// Encode ...
+// Encode Vigenere is a method on the Vigenere struct which utilizes
+//	the struct field "key" as a cipher, as described in NewVigenere,
+//	and returns a string encoded using the Vigenere method.
 func (c *Vigenere) Encode(s string) string {
-	s = strings.Map(Normalize, s)
-	fmt.Print(s)
-	return ""
+	normalizedS := strings.Map(Normalize, s)
+	// Apply the same-string-index key-alphabet-distance as a shift cipher to the
+	//	subject string
+	i := 0
+	encodedS := strings.Map(
+		func(r rune) rune {
+			defer func() { i++ }()
+			nextPos := r + (rune(c.key[i%len(c.key)]) - 'a')
+			if nextPos < 'a' {
+				return 'z' - ('a' - nextPos)
+			} else if nextPos > 'z' {
+				return 'a' + nextPos - 'z' - 1
+			}
+			return nextPos
+		}, normalizedS)
+	return encodedS
 }
 
 // Decode Caesar returns deciphered string which used the Encode Caesar method.
@@ -149,9 +177,22 @@ func (c *Shift) Decode(s string) string {
 	return cipheredS
 }
 
-// Decode ...
+// Decode Vigenere returns deciphered string which used the Encode Vigenere method.
 func (c *Vigenere) Decode(s string) string {
-	s = strings.Map(Normalize, s)
-	fmt.Print(s)
-	return ""
+	normalizedS := strings.Map(Normalize, s)
+	// Apply the same-string-index key-alphabet-distance as a shift cipher to the
+	//	subject string
+	i := 0
+	decodedS := strings.Map(
+		func(r rune) rune {
+			defer func() { i++ }()
+			nextPos := r - (rune(c.key[i%len(c.key)]) - 'a')
+			if nextPos < 'a' {
+				return 'z' - ('a' - nextPos - 1)
+			} else if nextPos > 'z' {
+				return 'a' + nextPos - 'z' - 1
+			}
+			return nextPos
+		}, normalizedS)
+	return decodedS
 }
