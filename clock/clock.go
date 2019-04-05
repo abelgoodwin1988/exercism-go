@@ -28,16 +28,11 @@ func (c *Clock) String() string {
 // Add accepts a clock object pointer, and adds indicated hours minutes
 //	to it's fields
 func (c Clock) Add(m int) Clock {
-	nm := (c.m + m) % 1440
-	return Clock{m: nm}
+	return New(0, c.m+m)
 }
 
 // Subtract accepts a clock object, and subtracts indicated hours minutes
 //	to it's fields
 func (c Clock) Subtract(m int) Clock {
-	nm := (c.m - m) % 1440
-	if nm < 0 {
-		nm += 1440
-	}
-	return Clock{m: nm}
+	return New(0, c.m-m)
 }
