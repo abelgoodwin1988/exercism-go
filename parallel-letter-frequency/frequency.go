@@ -14,7 +14,7 @@ func Frequency(s string) FreqMap {
 }
 
 // ConcurrentFrequency runs concurrent frequency against an array
-//	of strings, merges the results of the frequencies and returns them.
+//	of strings, merges the results of the FreqMap, and returns merged result.
 func ConcurrentFrequency(sArr []string) FreqMap {
 	m := FreqMap{}
 	fmChan := make(chan FreqMap)
