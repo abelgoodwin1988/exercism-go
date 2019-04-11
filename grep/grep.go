@@ -31,23 +31,16 @@ func Search(pattern string, flags []string, files []string) []string {
 	)
 	// Parse flags into readable names
 	for _, flag := range flags {
-		if flag == "-n" {
+		switch flag {
+		case "-n":
 			displayLineNumber = true
-			continue
-		}
-		if flag == "-l" {
+		case "-l":
 			displayFileNameOnly = true
-			continue
-		}
-		if flag == "-i" {
+		case "-i":
 			matchCaseInsensitive = true
-			continue
-		}
-		if flag == "-v" {
+		case "-v":
 			matchNonMatches = true
-			continue
-		}
-		if flag == "-x" {
+		case "-x":
 			matchEntireLine = true
 		}
 	}
