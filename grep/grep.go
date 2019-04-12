@@ -62,53 +62,34 @@ func Search(pattern string, flags []string, files []string) []string {
 		i := 0
 		for scanner.Scan() {
 			line := scanner.Text()
+			normalized_line := line
 			matchesAtStartOfIteration := len(match)
+			if matchCaseInsensitive {
+				normalized_line = strings.ToLower(line)
+				pattern = strings.ToLower(pattern)
+			}
 			// default case followed serialized cases
 			//
-			if !matchCaseInsensitive && !matchNonMatches && !matchEntireLine {
-				if strings.Contains(line, pattern) {
+			if !matchNonMatches && !matchEntireLine {
+				if strings.Contains(normalized_line, pattern) {
 					match = append(match, line)
 				}
 			}
-			// insensitive match
-			if matchCaseInsensitive && !matchNonMatches && !matchEntireLine {
-				if strings.Contains(strings.ToLower(line), strings.ToLower(pattern)) {
+			// nonMatch
+			if matchNonMatches && !matchEntireLine {
+				if !strings.Contains(normalized_line, pattern) {
 					match = append(match, line)
 				}
 			}
-			// insensitive match & nonMatch
-			if matchCaseInsensitive && matchNonMatches && !matchEntireLine {
-				if !strings.Contains(strings.ToLower(line), strings.ToLower(pattern)) {
+			//                     entire line match
+			if !matchNonMatches && matchEntireLine {
+				if normalized_line == pattern {
 					match = append(match, line)
 				}
 			}
-			// insensitive match             & entire line match
-			if matchCaseInsensitive && !matchNonMatches && matchEntireLine {
-				if strings.ToLower(line) == strings.ToLower(pattern) {
-					match = append(match, line)
-				}
-			}
-			// insensitive match & nonMatch & entire line match
-			if matchCaseInsensitive && matchNonMatches && matchEntireLine {
-				if strings.ToLower(line) != strings.ToLower(pattern) {
-					match = append(match, line)
-				}
-			}
-			//                     nonMatch
-			if !matchCaseInsensitive && matchNonMatches && !matchEntireLine {
-				if !strings.Contains(line, pattern) {
-					match = append(match, line)
-				}
-			}
-			//                     nonMatch & entire line match
-			if !matchCaseInsensitive && matchNonMatches && matchEntireLine {
-				if line != pattern {
-					match = append(match, line)
-				}
-			}
-			//                                entire line match
-			if !matchCaseInsensitive && !matchNonMatches && matchEntireLine {
-				if line == pattern {
+			// nonMatch & entire line match
+			if matchNonMatches && matchEntireLine {
+				if normalized_line != pattern {
 					match = append(match, line)
 				}
 			}
