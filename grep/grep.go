@@ -61,37 +61,31 @@ func Search(pattern string, flags []string, files []string) []string {
 		scanner := bufio.NewScanner(file)
 		i := 0
 		for scanner.Scan() {
+			isMatch := false
 			line := scanner.Text()
-			normalized_line := line
+			normalizedLine := line
 			matchesAtStartOfIteration := len(match)
+			// If case insenvisity, lower all strings
 			if matchCaseInsensitive {
-				normalized_line = strings.ToLower(line)
+				normalizedLine = strings.ToLower(line)
 				pattern = strings.ToLower(pattern)
 			}
-			// default case followed serialized cases
-			//
-			if !matchNonMatches && !matchEntireLine {
-				if strings.Contains(normalized_line, pattern) {
-					match = append(match, line)
+			// Entire line match or contains match
+			if matchEntireLine {
+				if strings.ToLower(pattern) == strings.ToLower(normalizedLine) {
+					isMatch = true
+				}
+			} else {
+				if strings.Contains(normalizedLine, pattern) {
+					isMatch = true
 				}
 			}
-			// nonMatch
-			if matchNonMatches && !matchEntireLine {
-				if !strings.Contains(normalized_line, pattern) {
-					match = append(match, line)
-				}
+
+			if !matchNonMatches && isMatch {
+				match = append(match, line)
 			}
-			//                     entire line match
-			if !matchNonMatches && matchEntireLine {
-				if normalized_line == pattern {
-					match = append(match, line)
-				}
-			}
-			// nonMatch & entire line match
-			if matchNonMatches && matchEntireLine {
-				if normalized_line != pattern {
-					match = append(match, line)
-				}
+			if matchNonMatches && !isMatch {
+				match = append(match, line)
 			}
 
 			matchesAtEndOfIteration := len(match)

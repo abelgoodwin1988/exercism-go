@@ -25,12 +25,11 @@ func ConcurrentFrequency(sArr []string) FreqMap {
 		}(s)
 	}
 	var fm FreqMap
-	for i := 0; i < len(sArr); i++ {
+	for range sArr {
 		fm = <-fmChan
 		for key, val := range fm {
-			m[key] = m[key] + val
+			m[key] += +val
 		}
 	}
-	close(fmChan)
 	return m
 }
