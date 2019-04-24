@@ -61,45 +61,32 @@ func Search(pattern string, flags []string, files []string) []string {
 		scanner := bufio.NewScanner(file)
 		i := 0
 		for scanner.Scan() {
-			isMatch := false
 			line := scanner.Text()
 			normalizedLine := line
-			matchesAtStartOfIteration := len(match)
+			var matched bool
 			// If case insenvisity, lower all strings
 			if matchCaseInsensitive {
 				normalizedLine = strings.ToLower(line)
 				pattern = strings.ToLower(pattern)
 			}
-			// Entire line match or contains match
+
+			// Match
 			if matchEntireLine {
-				if strings.ToLower(pattern) == strings.ToLower(normalizedLine) {
-					isMatch = true
-				}
+				matched = pattern == normalizedLine
 			} else {
-				if strings.Contains(normalizedLine, pattern) {
-					isMatch = true
-				}
+				matched = strings.Contains(normalizedLine, pattern)
 			}
 
-			if !matchNonMatches && isMatch {
-				match = append(match, line)
-			}
-			if matchNonMatches && !isMatch {
-				match = append(match, line)
-			}
-
-			matchesAtEndOfIteration := len(match)
-			lineWasMatched := matchesAtStartOfIteration != matchesAtEndOfIteration
 			// "Print" additions and rules
 			// add line display number
-			if displayLineNumber && lineWasMatched {
+			if displayLineNumber && matched {
 				match[len(match)-1] = strconv.Itoa(i+1) + ":" + match[len(match)-1]
 			}
 			// add filename to start if we're iterating over multiple files
-			if multipleFilesMatching && lineWasMatched {
+			if multipleFilesMatching && matched {
 				match[len(match)-1] = fileName + ":" + match[len(match)-1]
 			}
-			if displayFileNameOnly && lineWasMatched {
+			if displayFileNameOnly && matched {
 				match[len(match)-1] = fileName
 				// dedupe
 				encountered := map[string]struct{}{}
